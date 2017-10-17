@@ -10,10 +10,10 @@ namespace DomainTime
 
 		static MyDomainTime()
 		{
-			// by default use UtcNow for the "now" value, but you can override it
 			_funcForDeterminingNow = DefaultNowFunc;
 		}
 
+		// this is the default for how "right now" is determined. It can be overridden for testing
 		private static DateTime DefaultNowFunc()
 		{
 			return DateTime.UtcNow;
@@ -25,7 +25,7 @@ namespace DomainTime
 		}
 
 		/// <summary>
-		/// Returns whatever "right now" is. Note that it's not a static method like DateTime.Now
+		/// Returns whatever "right now" is. Note that it's not a static property like DateTime.Now
 		/// </summary>
 		/// <returns></returns>
 		public DateTimeOffset Now()
@@ -42,8 +42,7 @@ namespace DomainTime
 
 		public bool IsExpired(DateTime expirationDate)
 		{
-			/* ignore the time component of the input date and compare against midnight local time */ 
-			
+			/* ignore the time component of the input date and compare against midnight local time */
 			var realExpirationDate = new DateTime(expirationDate.Year, expirationDate.Month, expirationDate.Day, 23, 59, 59, DateTimeKind.Local);
 			return Now() > realExpirationDate;
 		}
@@ -57,6 +56,10 @@ namespace DomainTime
 			_funcForDeterminingNow = nowFunc;
 		}
 
+		/// <summary>
+		/// After you've altered the default Now() functionality for testing you might want to set it back to normal for the next test,
+		/// given that the function is static and may leak into the next test.
+		/// </summary>
 		public static void ResetNow()
 		{
 			_funcForDeterminingNow = DefaultNowFunc;
